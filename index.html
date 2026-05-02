@@ -664,8 +664,18 @@
     }
 
     @media (max-width: 1050px) {
+      .layout {
+        display: flex;
+        flex-direction: column;
+      }
+
       .sidebar {
+        order: 2;
         position: static;
+      }
+
+      .guide-panel {
+        order: 1;
       }
 
       .hero,
