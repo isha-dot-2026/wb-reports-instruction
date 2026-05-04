@@ -823,10 +823,10 @@
         <strong>Периоды для недельных отчетов</strong>
         <p>Показываются 4 предыдущие полные недели, не включая текущую.</p>
         <ul class="date-list" id="dateList">
-          <li><span>1 неделя</span><em>30.03.2026 - 05.04.2026</em></li>
-          <li><span>2 неделя</span><em>06.04.2026 - 12.04.2026</em></li>
-          <li><span>3 неделя</span><em>13.04.2026 - 19.04.2026</em></li>
-          <li><span>4 неделя</span><em>20.04.2026 - 26.04.2026</em></li>
+          <li><span>1 неделя</span><em>06.04.2026 - 12.04.2026</em></li>
+          <li><span>2 неделя</span><em>13.04.2026 - 19.04.2026</em></li>
+          <li><span>3 неделя</span><em>20.04.2026 - 26.04.2026</em></li>
+          <li><span>4 неделя</span><em>27.04.2026 - 03.05.2026</em></li>
         </ul>
       </div>
       <div class="arrow">
@@ -1486,7 +1486,48 @@
       renderDashboard();
     });
 
-    renderDashboard();
+    function renderWeeklyDates() {
+      const dateList = document.getElementById('dateList');
+      if (!dateList) return;
+
+      const today = new Date();
+      const currentMonday = new Date(today);
+      const day = currentMonday.getDay() || 7;
+      currentMonday.setDate(currentMonday.getDate() - day + 1);
+      currentMonday.setHours(0, 0, 0, 0);
+
+      const weeks = [];
+      for (let index = 4; index >= 1; index -= 1) {
+        const start = new Date(currentMonday);
+        start.setDate(currentMonday.getDate() - index * 7);
+
+        const end = new Date(start);
+        end.setDate(start.getDate() + 6);
+
+        weeks.push({ start, end });
+      }
+
+      const format = (date) => {
+        const dayText = String(date.getDate()).padStart(2, '0');
+        const monthText = String(date.getMonth() + 1).padStart(2, '0');
+        return `${dayText}.${monthText}.${date.getFullYear()}`;
+      };
+
+      dateList.innerHTML = weeks.map((week, index) => (
+        `<li><span>${index + 1} неделя</span><em>${format(week.start)} - ${format(week.end)}</em></li>`
+      )).join('');
+    }
+
+    function bootDashboard() {
+      renderWeeklyDates();
+      renderDashboard();
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', bootDashboard);
+    } else {
+      bootDashboard();
+    }
   </script>
 </body>
 </html>
