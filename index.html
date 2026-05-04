@@ -191,6 +191,27 @@
       box-shadow: var(--shadow);
     }
 
+    .hero-start {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      min-width: 0;
+    }
+
+    .hero-copy {
+      min-width: 0;
+    }
+
+    .hero-copy h2 {
+      margin: 0 0 8px;
+      font-size: 24px;
+      line-height: 1.15;
+    }
+
+    .hero-copy p {
+      max-width: 480px;
+    }
+
     .market-logos {
       display: flex;
       gap: 12px;
@@ -677,6 +698,16 @@
       cursor: zoom-in;
     }
 
+    .shot.image-error {
+      border-color: #ffb49b;
+      background: #fff7f2;
+    }
+
+    .shot.image-error img {
+      min-height: 140px;
+      background: repeating-linear-gradient(45deg, #fff7f2, #fff7f2 12px, #ffe7dc 12px, #ffe7dc 24px);
+    }
+
     .shot figcaption {
       padding: 12px 14px;
       color: var(--muted);
@@ -815,9 +846,15 @@
 
   <main class="wrap">
     <section class="hero">
-      <div class="market-logos">
-        <div class="logo wb">WB</div>
-        <div class="logo ozon">OZ</div>
+      <div class="hero-start">
+        <div class="market-logos">
+          <div class="logo wb">WB</div>
+          <div class="logo ozon">OZ</div>
+        </div>
+        <div class="hero-copy">
+          <h2>WB и Ozon</h2>
+          <p>Откройте карточки отчетов по порядку, скачайте файлы и отмечайте готовые пункты.</p>
+        </div>
       </div>
       <div class="date-panel">
         <strong>Периоды для недельных отчетов</strong>
@@ -1377,8 +1414,26 @@
     };
 
     document.querySelectorAll('.shot img').forEach((image) => {
+      image.addEventListener('error', () => {
+        const originalSrc = image.getAttribute('src') || '';
+        if (originalSrc.includes('/') && !image.dataset.fallbackTried) {
+          image.dataset.fallbackTried = 'true';
+          image.src = originalSrc.split('/').pop();
+          return;
+        }
+        const shot = image.closest('.shot');
+        if (!shot || shot.classList.contains('image-error')) return;
+        shot.classList.add('image-error');
+        const caption = shot.querySelector('figcaption');
+        if (caption) {
+          caption.textContent = `Скриншот не загрузился. Проверьте, что папка с картинками загружена рядом с index.html. ${caption.textContent}`;
+        }
+      });
+
       image.addEventListener('click', () => {
-        lightboxImage.src = image.src;
+        const source = image.currentSrc || image.src;
+        if (!source) return;
+        lightboxImage.src = source;
         lightboxImage.alt = image.alt || '';
         lightbox.classList.add('open');
         lightbox.setAttribute('aria-hidden', 'false');
